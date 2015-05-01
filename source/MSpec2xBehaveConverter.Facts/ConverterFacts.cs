@@ -75,7 +75,7 @@ namespace Appccelerate.Bootstrapper
     {
         private static CustomExtensionStrategy Strategy;
 
-        private static CustomExtensionBase First;
+        protected static CustomExtensionBase First;
 
         private static CustomExtensionBase Second;
 

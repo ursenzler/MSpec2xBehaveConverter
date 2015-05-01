@@ -1,21 +1,37 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Converter.cs" company="Appccelerate">
+//   Copyright (c) 2008-2015
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace MSpec2xBehaveConverter
 {
     using System;
     using System.Text.RegularExpressions;
 
-    using Appccelerate.IO.Access.Internals;
-
     public class Converter
     {
         private string content;
 
-        public string Convert(string content)
+        public string Convert(string contentToConvert)
         {
-            this.content = content;
+            this.content = contentToConvert;
 
             this.ReplaceUsing();
 
-            this.ReplaceSubjectWithClass();
+            this.ReplaceSubjects();
 
             return this.content;
         }
@@ -25,25 +41,25 @@ namespace MSpec2xBehaveConverter
             this.content = this.content.Replace("using Machine.Specifications;", "using Xbehave;");
         }
 
-        private void ReplaceSubjectWithClass()
+        private void ReplaceSubjects()
         {
-            int subjectIndex = this.content.IndexOf("[Subject(");
+            int subjectIndex = this.FindIndexOf("[Subject(");
 
             while(subjectIndex >= 0)
             {
                 // subject
-                int subjectStart = this.content.IndexOf("(", subjectIndex);
-                int subjectEnd = this.content.IndexOf(")", subjectIndex);
+                int subjectStart = this.FindIndexOf("(", subjectIndex);
+                int subjectEnd = this.FindIndexOf(")", subjectIndex);
 
                 string subject = this.content.Substring(subjectStart + 1, subjectEnd - subjectStart - 2).Trim('"').Replace(" ", "_");
 
                 // scenario
-                int scenarioNameStart = this.content.IndexOf("class", subjectIndex) + 6;
+                int scenarioNameStart = this.FindIndexOf("class", subjectIndex) + 6;
                 int scenarioNameEnd = this.content.IndexOfAny(new[] { '\n', ' ' }, scenarioNameStart);
 
                 string scenarioName = this.content.Substring(scenarioNameStart, scenarioNameEnd - scenarioNameStart);
 
-                int classStart = this.content.IndexOf("{", subjectIndex);
+                int classStart = this.FindIndexOf("{", subjectIndex);
 
                 // public partial class <subject>
                 // [Scenario]
@@ -56,11 +72,11 @@ namespace MSpec2xBehaveConverter
                     "()\n        ");
 
                 // private static -> = null
-                Regex field = new Regex(@"private static (?<f>[\w<>]+ \w+);");
+                Regex field = new Regex(@"(private|protected) static (?<f>[\w<>]+ \w+);");
                 this.content = field.Replace(this.content, @"    ${f} = null;");
 
                 // establish
-                int establishStart = this.content.IndexOf("Establish ", classStart);
+                int establishStart = this.FindIndexOf("Establish ", classStart);
                 while (establishStart >= 0)
                 {
                     int establishEnd = this.FindClosingBracket(this.FindNextOpeningBracket(establishStart));
@@ -73,11 +89,11 @@ namespace MSpec2xBehaveConverter
                         establishAction.TrimEnd().TrimEnd(';') + 
                         ")");
 
-                    establishStart = this.content.IndexOf("Establish ", classStart);
+                    establishStart = this.FindIndexOf("Establish ", classStart);
                 }
                 
                 // because of
-                int becauseStart = this.content.IndexOf("Because ", classStart);
+                int becauseStart = this.FindIndexOf("Because ", classStart);
                 while (becauseStart >= 0)
                 {
                     int becauseEnd = this.FindClosingBracket(this.FindNextOpeningBracket(becauseStart));
@@ -90,16 +106,16 @@ namespace MSpec2xBehaveConverter
                         becauseAction.TrimEnd().TrimEnd(';') +
                         ")");
 
-                    becauseStart = this.content.IndexOf("Because ", classStart);
+                    becauseStart = this.FindIndexOf("Because ", classStart);
                 }
 
                 // it
-                int itStart = this.content.IndexOf("It ", classStart);
+                int itStart = this.FindIndexOf("It ", classStart);
                 while (itStart > 0)
                 {
                     int itEnd = this.FindClosingBracket(this.FindNextOpeningBracket(itStart));
                     int z = this.FindNextOpeningBracket(itStart);
-                    string it = this.content.Substring(itStart + 3, this.content.IndexOf(" ", itStart + 4) - itStart - 3);
+                    string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
                     string itAction = this.content.Substring(z, itEnd - z);
 
                     this.content = this.content.Replace(
@@ -108,7 +124,7 @@ namespace MSpec2xBehaveConverter
                         itAction.TrimEnd().TrimEnd(';') +
                         ")");
 
-                    itStart = this.content.IndexOf("It ", classStart);
+                    itStart = this.FindIndexOf("It ", classStart);
                 }
 
                 // closing }
@@ -117,8 +133,13 @@ namespace MSpec2xBehaveConverter
                 
 
                 // and the next
-                subjectIndex = this.content.IndexOf("[Subject(");
+                subjectIndex = this.FindIndexOf("[Subject(");
             }
+        }
+
+        private int FindIndexOf(string search, int start =  0)
+        {
+            return this.content.IndexOf(search, start, StringComparison.InvariantCulture);
         }
 
         private int FindNextOpeningBracket(int start)

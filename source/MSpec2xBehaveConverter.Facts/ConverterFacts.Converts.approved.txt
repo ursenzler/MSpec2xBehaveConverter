@@ -59,12 +59,12 @@ namespace Appccelerate.Bootstrapper
                 Bootstrapper.Run();
             });
 
-            "it should_only_initialize_contexts_once_for_all_extensions"._(() =>
+            "it should only initialize contexts once for all extensions"._(() =>
             {
                 Strategy.RunConfigurationInitializerAccessCounter.Should().Be(1);
             });
 
-            "it should_pass_the_initialized_values_from_the_contexts_to_the_extensions"._(() =>
+            "it should pass the initialized values from the contexts to the extensions"._(() =>
             {
                 var expected = new Dictionary<string, string>
                     {
@@ -78,7 +78,7 @@ namespace Appccelerate.Bootstrapper
                 Second.Registered.Should().Be("RunTest");
             });
 
-            "it should_execute_the_extensions_and_the_extension_points_according_to_the_strategy_defined_order"._(() =>
+            "it should execute the extensions and the extension points according to the strategy defined order"._(() =>
             {
                 var sequence = SequenceQueue;
 
