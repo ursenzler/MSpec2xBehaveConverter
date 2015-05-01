@@ -104,9 +104,7 @@ namespace Appccelerate.Bootstrapper
             };
 
         It should_only_initialize_contexts_once_for_all_extensions = () =>
-            {
-                Strategy.RunConfigurationInitializerAccessCounter.Should().Be(1);
-            };
+            Strategy.RunConfigurationInitializerAccessCounter.Should().Be(1);
 
         It should_pass_the_initialized_values_from_the_contexts_to_the_extensions = () =>
             {

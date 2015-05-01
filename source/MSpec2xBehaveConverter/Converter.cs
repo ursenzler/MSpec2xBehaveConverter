@@ -19,6 +19,7 @@
 namespace MSpec2xBehaveConverter
 {
     using System;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     public class Converter
@@ -67,9 +68,9 @@ namespace MSpec2xBehaveConverter
                 string prefix = this.content.Substring(subjectIndex, classStart - subjectIndex);
                 this.content = this.content.Replace(
                     prefix, 
-                    "public partial class " + subject + "\n    {\n        [Scenario]\n        public void " +
+                    "public partial class " + subject + "\r\n    {\r\n        [Scenario]\r\n        public void " +
                     scenarioName.TrimEnd() +
-                    "()\n        ");
+                    "()\r\n        ");
 
                 // private static -> = null
                 Regex field = new Regex(@"(private|protected) static (?<f>[\w<>]+ \w+);");
@@ -85,44 +86,87 @@ namespace MSpec2xBehaveConverter
                 
                     this.content = this.content.Replace(
                         this.content.Substring(establishStart, establishEnd - establishStart),
-                        "    \"establish\"._(() =>\n            " + 
+                        "    \"establish\"._(() =>\r\n            " + 
                         establishAction.TrimEnd().TrimEnd(';') + 
                         ")");
 
                     establishStart = this.FindIndexOf("Establish ", classStart);
                 }
+
+                var noise = new[] { ' ', '\r', '\n', '\t', '(', ')', '=', '>' };
                 
                 // because of
                 int becauseStart = this.FindIndexOf("Because ", classStart);
                 while (becauseStart >= 0)
                 {
-                    int becauseEnd = this.FindClosingBracket(this.FindNextOpeningBracket(becauseStart));
-                    int y = this.FindNextOpeningBracket(becauseStart);
-                    string becauseAction = this.content.Substring(y, becauseEnd - y);
+                    int lambda = this.FindIndexOf("=>", becauseStart);
 
-                    this.content = this.content.Replace(
-                        this.content.Substring(becauseStart, becauseEnd - becauseStart),
-                        "    \"because\"._(() =>\n            " +
-                        becauseAction.TrimEnd().TrimEnd(';') +
-                        ")");
+                    while (noise.Contains(this.content[lambda]))
+                    {
+                        lambda++;
+                    }
+                    if (this.content[lambda] == '{') // lambda with { }
+                    {
+                        int becauseEnd = this.FindClosingBracket(this.FindNextOpeningBracket(becauseStart));
+                        int y = this.FindNextOpeningBracket(becauseStart);
+                        string becauseAction = this.content.Substring(y, becauseEnd - y);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(becauseStart, becauseEnd - becauseStart),
+                            "    \"because\"._(() =>\r\n            " +
+                            becauseAction.TrimEnd().TrimEnd(';') +
+                            ")");
+                    }
+                    else // lambda without { }
+                    {
+                        int semicolon = this.FindIndexOf(";", becauseStart);
+                        string becauseAction = this.content.Substring(lambda, semicolon - lambda);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(becauseStart, semicolon - becauseStart),
+                            "    \"because\"._(() =>\r\n            {\r\n                " +
+                            becauseAction.TrimEnd() +
+                            ";\r\n            })");
+                    }
 
                     becauseStart = this.FindIndexOf("Because ", classStart);
                 }
-
+                
                 // it
                 int itStart = this.FindIndexOf("It ", classStart);
                 while (itStart > 0)
                 {
-                    int itEnd = this.FindClosingBracket(this.FindNextOpeningBracket(itStart));
-                    int z = this.FindNextOpeningBracket(itStart);
-                    string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
-                    string itAction = this.content.Substring(z, itEnd - z);
+                    int lambda = this.FindIndexOf("=>", itStart);
 
-                    this.content = this.content.Replace(
-                        this.content.Substring(itStart, itEnd - itStart),
-                        "    \"it " + it + "\"._(() =>\n            " +
-                        itAction.TrimEnd().TrimEnd(';') +
-                        ")");
+                    while (noise.Contains(this.content[lambda]))
+                    {
+                        lambda++;
+                    }
+                    if (this.content[lambda] == '{') // lambda with { }
+                    {
+                        int itEnd = this.FindClosingBracket(this.FindNextOpeningBracket(itStart));
+                        int z = this.FindNextOpeningBracket(itStart);
+                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
+                        string itAction = this.content.Substring(z, itEnd - z);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(itStart, itEnd - itStart),
+                            "    \"it " + it + "\"._(() =>\r\n            " +
+                            itAction.TrimEnd().TrimEnd(';') +
+                            ")");
+                    }
+                    else // lambda without { }
+                    {
+                        int semicolon = this.FindIndexOf(";", itStart);
+                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
+                        string itAction = this.content.Substring(lambda, semicolon - lambda);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(itStart, semicolon - itStart),
+                            "    \"it " + it + "\"._(() =>\r\n            {\r\n                " +
+                            itAction.TrimEnd() +
+                            ";\r\n            })");
+                    }
 
                     itStart = this.FindIndexOf("It ", classStart);
                 }
