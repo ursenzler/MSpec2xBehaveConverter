@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSpec2xBehaveConverter", "MSpec2xBehaveConverter\MSpec2xBehaveConverter.csproj", "{BDC48DD4-901C-424D-B6A3-7D5C214CF6C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSpec2xBehaveConverter.Facts", "MSpec2xBehaveConverter.Facts\MSpec2xBehaveConverter.Facts.csproj", "{042878DE-59A7-44AD-8D25-B8B0F9E54AC3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDC48DD4-901C-424D-B6A3-7D5C214CF6C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDC48DD4-901C-424D-B6A3-7D5C214CF6C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDC48DD4-901C-424D-B6A3-7D5C214CF6C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDC48DD4-901C-424D-B6A3-7D5C214CF6C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{042878DE-59A7-44AD-8D25-B8B0F9E54AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{042878DE-59A7-44AD-8D25-B8B0F9E54AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{042878DE-59A7-44AD-8D25-B8B0F9E54AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{042878DE-59A7-44AD-8D25-B8B0F9E54AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
