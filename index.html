@@ -34,165 +34,162 @@
 
 <p>MSpec:</p>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using FluentAssertions;
-    using Machine.Specifications;
+    <span class="pl-k">using</span> FluentAssertions;
+    <span class="pl-k">using</span> Machine.Specifications;
 
-    [Subject("Question answering")]
-    public class When_calling_answer_with_expressions_with_constraints
+    [Subject(<span class="pl-s"><span class="pl-pds">"</span>Question answering<span class="pl-pds">"</span></span>)]
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">When_calling_answer_with_expressions_with_constraints</span>
     {
-        private const string NoConstraint = "N";
-        private const string WithTrueConstraint = "T";
-        private const string WithFalseConstraint = "F";
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> NoConstraint = <span class="pl-s"><span class="pl-pds">"</span>N<span class="pl-pds">"</span></span>;
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> WithTrueConstraint = <span class="pl-s"><span class="pl-pds">"</span>T<span class="pl-pds">"</span></span>;
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> WithFalseConstraint = <span class="pl-s"><span class="pl-pds">"</span>F<span class="pl-pds">"</span></span>;
 
-        private static IEvaluationEngine engine;
+        <span class="pl-k">private</span> <span class="pl-k">static</span> IEvaluationEngine engine;
 
-        private static string answer;
+        <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">string</span> answer;
 
         Establish context = () =&gt;
             {
-                engine = new EvaluationEngine();
+                engine = <span class="pl-k">new</span> EvaluationEngine();
 
-                engine.Solve&lt;WhatIsTheText, string&gt;()
-                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                engine.Solve&lt;WhatIsTheText, <span class="pl-k">string</span>&gt;()
+                    .AggregateWithExpressionAggregator(<span class="pl-k">string</span>.Empty, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                     .ByEvaluating((q, p) =&gt; NoConstraint)
-                    .When(q =&gt; false)
+                    .When(q =&gt; <span class="pl-c1">false</span>)
                         .ByEvaluating((q, p) =&gt; WithFalseConstraint)
-                    .When(q =&gt; true)
+                    .When(q =&gt; <span class="pl-c1">true</span>)
                         .ByEvaluating((q, p) =&gt; WithTrueConstraint);
             };
 
         Because of = () =&gt;
             {
-                answer = engine.Answer(new WhatIsTheText());
+                answer = engine.Answer(<span class="pl-k">new</span> WhatIsTheText());
             };
 
         It should_evaluate_expressions_without_constraints = () =&gt; 
-            answer.Should().Contain(NoConstraint);
+            <span class="pl-en">answer.Should</span>()<span class="pl-en">.Contain</span>(NoConstraint);
 
         It should_evaluate_expressions_with_fulfilled_constraints = () =&gt; 
-            answer.Should().Contain(WithTrueConstraint);
+            <span class="pl-en">answer.Should</span>()<span class="pl-en">.Contain</span>(WithTrueConstraint);
 
         It should_ignore_expressions_with_constraints_that_are_not_fulfilled = () =&gt; 
-            answer.Should().NotContain(WithFalseConstraint);
+            <span class="pl-en">answer.Should</span>()<span class="pl-en">.NotContain</span>(WithFalseConstraint);
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>After automatic conversion:</p>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using FluentAssertions;
-    using Xbehave;
+    <span class="pl-k">using</span> FluentAssertions;
+    <span class="pl-k">using</span> Xbehave;
 
-    public partial class Question_answering
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Question_answering</span>
     {
         [Scenario]
-        public void When_calling_answer_with_expressions_with_constraints()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_with_expressions_with_constraints</span>()
         {
-        private const string NoConstraint = "N";
-        private const string WithTrueConstraint = "T";
-        private const string WithFalseConstraint = "F";
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> NoConstraint = <span class="pl-s"><span class="pl-pds">"</span>N<span class="pl-pds">"</span></span>;
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> WithTrueConstraint = <span class="pl-s"><span class="pl-pds">"</span>T<span class="pl-pds">"</span></span>;
+        <span class="pl-k">private</span> <span class="pl-k">const</span> <span class="pl-k">string</span> WithFalseConstraint = <span class="pl-s"><span class="pl-pds">"</span>F<span class="pl-pds">"</span></span>;
 
-            IEvaluationEngine engine = null;
+            IEvaluationEngine engine = <span class="pl-c1">null</span>;
 
-            string answer = null;
+            <span class="pl-k">string</span> answer = <span class="pl-c1">null</span>;
 
-            "establish"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                engine = new EvaluationEngine();
+                engine = <span class="pl-k">new</span> EvaluationEngine();
 
-                engine.Solve&lt;WhatIsTheText, string&gt;()
-                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                engine.Solve&lt;WhatIsTheText, <span class="pl-k">string</span>&gt;()
+                    .AggregateWithExpressionAggregator(<span class="pl-k">string</span>.Empty, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                     .ByEvaluating((q, p) =&gt; NoConstraint)
-                    .When(q =&gt; false)
+                    .When(q =&gt; <span class="pl-c1">false</span>)
                         .ByEvaluating((q, p) =&gt; WithFalseConstraint)
-                    .When(q =&gt; true)
+                    .When(q =&gt; <span class="pl-c1">true</span>)
                         .ByEvaluating((q, p) =&gt; WithTrueConstraint);
             });
 
-            "when calling answer with expressions with constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer with expressions with constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                answer = engine.Answer(new WhatIsTheText());
+                answer = engine.Answer(<span class="pl-k">new</span> WhatIsTheText());
             });
 
-            "it should evaluate expressions without constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions without constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(NoConstraint);
             });
 
-            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions with fulfilled constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(WithTrueConstraint);
             });
 
-            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should ignore expressions with constraints that are not fulfilled<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().NotContain(WithFalseConstraint);
             });
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>Remove <code>private</code> from constant definitions:</p>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using FluentAssertions;
-    using Xbehave;
+    <span class="pl-k">using</span> FluentAssertions;
+    <span class="pl-k">using</span> Xbehave;
 
-    public partial class Question_answering
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Question_answering</span>
     {
         [Scenario]
-        public void When_calling_answer_with_expressions_with_constraints()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_with_expressions_with_constraints</span>()
         {
-            const string NoConstraint = "N";
-            const string WithTrueConstraint = "T";
-            const string WithFalseConstraint = "F";
+            <span class="pl-k">const</span> <span class="pl-k">string</span> NoConstraint = <span class="pl-s"><span class="pl-pds">"</span>N<span class="pl-pds">"</span></span>;
+            <span class="pl-k">const</span> <span class="pl-k">string</span> WithTrueConstraint = <span class="pl-s"><span class="pl-pds">"</span>T<span class="pl-pds">"</span></span>;
+            <span class="pl-k">const</span> <span class="pl-k">string</span> WithFalseConstraint = <span class="pl-s"><span class="pl-pds">"</span>F<span class="pl-pds">"</span></span>;
 
-            IEvaluationEngine engine = null;
+            IEvaluationEngine engine = <span class="pl-c1">null</span>;
 
-            string answer = null;
+            <span class="pl-k">string</span> answer = <span class="pl-c1">null</span>;
 
-            "establish"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                engine = new EvaluationEngine();
+                engine = <span class="pl-k">new</span> EvaluationEngine();
 
-                engine.Solve&lt;WhatIsTheText, string&gt;()
-                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                engine.Solve&lt;WhatIsTheText, <span class="pl-k">string</span>&gt;()
+                    .AggregateWithExpressionAggregator(<span class="pl-k">string</span>.Empty, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                     .ByEvaluating((q, p) =&gt; NoConstraint)
-                    .When(q =&gt; false)
+                    .When(q =&gt; <span class="pl-c1">false</span>)
                         .ByEvaluating((q, p) =&gt; WithFalseConstraint)
-                    .When(q =&gt; true)
+                    .When(q =&gt; <span class="pl-c1">true</span>)
                         .ByEvaluating((q, p) =&gt; WithTrueConstraint);
             });
 
-            "when calling answer with expressions with constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer with expressions with constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                answer = engine.Answer(new WhatIsTheText());
+                answer = engine.Answer(<span class="pl-k">new</span> WhatIsTheText());
             });
 
-            "it should evaluate expressions without constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions without constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(NoConstraint);
             });
 
-            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions with fulfilled constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(WithTrueConstraint);
             });
 
-            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should ignore expressions with constraints that are not fulfilled<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().NotContain(WithFalseConstraint);
             });
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>This spec is runnable.</p>
 
@@ -206,58 +203,57 @@
 <li>shorten the scenario name</li>
 </ul>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using FluentAssertions;
-    using Xbehave;
+    <span class="pl-k">using</span> FluentAssertions;
+    <span class="pl-k">using</span> Xbehave;
 
-    public class Question_answering
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Question_answering</span>
     {
         [Scenario]
-        public void Constraints(
-            IEvaluationEngine engine, 
-            string answer)
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Constraints</span>(
+            <span class="pl-k">IEvaluationEngine</span> <span class="pl-smi">engine</span>, 
+            <span class="pl-k">string</span> <span class="pl-smi">answer</span>)
         {
-            const string NoConstraint = "N";
-            const string WithTrueConstraint = "T";
-            const string WithFalseConstraint = "F";
+            <span class="pl-k">const</span> <span class="pl-k">string</span> NoConstraint = <span class="pl-s"><span class="pl-pds">"</span>N<span class="pl-pds">"</span></span>;
+            <span class="pl-k">const</span> <span class="pl-k">string</span> WithTrueConstraint = <span class="pl-s"><span class="pl-pds">"</span>T<span class="pl-pds">"</span></span>;
+            <span class="pl-k">const</span> <span class="pl-k">string</span> WithFalseConstraint = <span class="pl-s"><span class="pl-pds">"</span>F<span class="pl-pds">"</span></span>;
 
-            "establish an evaluation engine with constraint expressions"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish an evaluation engine with constraint expressions<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                engine = new EvaluationEngine();
+                engine = <span class="pl-k">new</span> EvaluationEngine();
 
-                engine.Solve&lt;WhatIsTheText, string&gt;()
-                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                engine.Solve&lt;WhatIsTheText, <span class="pl-k">string</span>&gt;()
+                    .AggregateWithExpressionAggregator(<span class="pl-k">string</span>.Empty, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                     .ByEvaluating((q, p) =&gt; NoConstraint)
-                    .When(q =&gt; false)
+                    .When(q =&gt; <span class="pl-c1">false</span>)
                         .ByEvaluating((q, p) =&gt; WithFalseConstraint)
-                    .When(q =&gt; true)
+                    .When(q =&gt; <span class="pl-c1">true</span>)
                         .ByEvaluating((q, p) =&gt; WithTrueConstraint);
             });
 
-            "when calling answer with expressions with constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer with expressions with constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                answer = engine.Answer(new WhatIsTheText());
+                answer = engine.Answer(<span class="pl-k">new</span> WhatIsTheText());
             });
 
-            "it should evaluate expressions without constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions without constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(NoConstraint);
             });
 
-            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions with fulfilled constraints<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().Contain(WithTrueConstraint);
             });
 
-            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should ignore expressions with constraints that are not fulfilled<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 answer.Should().NotContain(WithFalseConstraint);
             });
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>Finished!</p>
 
@@ -274,196 +270,194 @@
 <li>convert the derived classes and the base class and move the code from the base class as a <code>Background</code> step into the merged class holding all scenarios. (see below)</li>
 </ul>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using System;
+    <span class="pl-k">using</span> System;
 
-    using FluentAssertions;
+    <span class="pl-k">using</span> FluentAssertions;
 
-    using Machine.Specifications;
+    <span class="pl-k">using</span> Machine.Specifications;
 
     [Subject(Concern.HierarchicalEngines)]
-    public class When_calling_answer_on_a_child_evaluation_engine : HierarchicalEngineContext
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">When_calling_answer_on_a_child_evaluation_engine</span> : <span class="pl-k">HierarchicalEngineContext</span>
     {
-        private static string childAnswer;
+        <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">string</span> childAnswer;
 
         Because of = () =&gt;
             {
-                childAnswer = ChildEngine.Answer(new Question());
+                childAnswer = ChildEngine.Answer(<span class="pl-k">new</span> Question());
             };
 
         It should_override_parent_aggregator_with_child_aggregator = () =&gt; 
-            childAnswer.Should().Contain(ChildAggregator);
+            <span class="pl-en">childAnswer.Should</span>()<span class="pl-en">.Contain</span>(ChildAggregator);
 
         It should_use_expressions_from_child_and_parent = () =&gt; 
             childAnswer
-                .Should().Contain(ParentExpression)
-                .And.Contain(ChildExpression);
+                .<span class="pl-en">Should</span>()<span class="pl-en">.Contain</span>(ParentExpression)
+                <span class="pl-en">.And.Contain</span>(ChildExpression);
 
         It should_evaluate_expressions_from_parent_first = () =&gt;
-            childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
-                .Should().BeTrue();
+            <span class="pl-en">childAnswer.EndsWith</span>(ParentExpression + ChildExpression, StringComparison.Ordinal)
+                <span class="pl-en">.Should</span>()<span class="pl-en">.BeTrue</span>();
     }
 
     [Subject(Concern.HierarchicalEngines)]
-    public class When_calling_answer_on_a_parent_evaluation_engine : HierarchicalEngineContext
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">When_calling_answer_on_a_parent_evaluation_engine</span> : <span class="pl-k">HierarchicalEngineContext</span>
     {
-        private static string parentAnswer;
+        <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">string</span> parentAnswer;
 
         Because of = () =&gt;
             {
-                parentAnswer = ParentEngine.Answer(new Question());
+                parentAnswer = ParentEngine.Answer(<span class="pl-k">new</span> Question());
             };
 
         It should_use_parent_aggregator = () =&gt; 
-            parentAnswer.Should().Contain(ParentAggregator);
+            <span class="pl-en">parentAnswer.Should</span>()<span class="pl-en">.Contain</span>(ParentAggregator);
 
         It should_use_expressions_only_from_parent = () =&gt; 
-            parentAnswer.Should().NotContain(ChildExpression);
+            <span class="pl-en">parentAnswer.Should</span>()<span class="pl-en">.NotContain</span>(ChildExpression);
     }
 
     [Subject(Concern.HierarchicalEngines)]
-    public class HierarchicalEngineContext
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">HierarchicalEngineContext</span>
     {
-        protected const string ParentAggregator = "parentAggregator";
-        protected const string ChildAggregator = "childAggregator";
-        protected const string ParentExpression = "parentExpression";
-        protected const string ChildExpression = "childExpression";
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentAggregator = <span class="pl-s"><span class="pl-pds">"</span>parentAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildAggregator = <span class="pl-s"><span class="pl-pds">"</span>childAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentExpression = <span class="pl-s"><span class="pl-pds">"</span>parentExpression<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildExpression = <span class="pl-s"><span class="pl-pds">"</span>childExpression<span class="pl-pds">"</span></span>;
 
         Establish context = () =&gt;
         {
-            ParentEngine = new EvaluationEngine();
-            ChildEngine = new EvaluationEngine(ParentEngine);
+            ParentEngine = <span class="pl-k">new</span> EvaluationEngine();
+            ChildEngine = <span class="pl-k">new</span> EvaluationEngine(ParentEngine);
 
-            ParentEngine.Solve&lt;Question, string&gt;()
-            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            ParentEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
             .ByEvaluating((q, p) =&gt; ParentExpression);
 
-            ChildEngine.Solve&lt;Question, string&gt;()
-                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+            ChildEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                 .ByEvaluating((q, p) =&gt; ChildExpression);
         };
 
-        protected static IEvaluationEngine ParentEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ParentEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected static IEvaluationEngine ChildEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ChildEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected class Question : IQuestion&lt;string&gt;
+        <span class="pl-k">protected</span> <span class="pl-k">class</span> <span class="pl-en">Question</span> : <span class="pl-k">IQuestion</span>&lt;<span class="pl-k">string</span>&gt;
         {
-            public string Describe()
+            <span class="pl-k">public</span> <span class="pl-k">string</span> <span class="pl-en">Describe</span>()
             {
-                return "test question";
+                <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>test question<span class="pl-pds">"</span></span>;
             }
         }
     }
-}
-</code></pre>
+}</pre></div>
 
-<p>After automatic convertion:</p>
+<p>After automatic conversion:</p>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using System;
+    <span class="pl-k">using</span> System;
 
-    using FluentAssertions;
+    <span class="pl-k">using</span> FluentAssertions;
 
-    using Xbehave;
+    <span class="pl-k">using</span> Xbehave;
 
-    public partial class Hierarchical_evaluation_engines
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Hierarchical_evaluation_engines</span>
     {
         [Scenario]
-        public void When_calling_answer_on_a_child_evaluation_engine()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_on_a_child_evaluation_engine</span>()
         {
-            string childAnswer = null;
+            <span class="pl-k">string</span> childAnswer = <span class="pl-c1">null</span>;
 
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                childAnswer = ChildEngine.Answer(new Question());
+                childAnswer = ChildEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should override parent aggregator with child aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should override parent aggregator with child aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.Should().Contain(ChildAggregator);
             });
 
-            "it should use expressions from child and parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions from child and parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer
                 .Should().Contain(ParentExpression)
                 .And.Contain(ChildExpression);
             });
 
-            "it should evaluate expressions from parent first"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions from parent first<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
                 .Should().BeTrue();
             });
     }
 
-    public partial class Hierarchical_evaluation_engines
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Hierarchical_evaluation_engines</span>
     {
         [Scenario]
-        public void When_calling_answer_on_a_parent_evaluation_engine()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_on_a_parent_evaluation_engine</span>()
         {
-            string parentAnswer = null;
+            <span class="pl-k">string</span> parentAnswer = <span class="pl-c1">null</span>;
 
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                parentAnswer = ParentEngine.Answer(new Question());
+                parentAnswer = ParentEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should use parent aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use parent aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().Contain(ParentAggregator);
             });
 
-            "it should use expressions only from parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions only from parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().NotContain(ChildExpression);
             });
     }
 
-    public partial class Hierarchical_evaluation_engines
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Hierarchical_evaluation_engines</span>
     {
         [Scenario]
-        public void HierarchicalEngineContext()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">HierarchicalEngineContext</span>()
         {
-        protected const string ParentAggregator = "parentAggregator";
-        protected const string ChildAggregator = "childAggregator";
-        protected const string ParentExpression = "parentExpression";
-        protected const string ChildExpression = "childExpression";
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentAggregator = <span class="pl-s"><span class="pl-pds">"</span>parentAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildAggregator = <span class="pl-s"><span class="pl-pds">"</span>childAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentExpression = <span class="pl-s"><span class="pl-pds">"</span>parentExpression<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildExpression = <span class="pl-s"><span class="pl-pds">"</span>childExpression<span class="pl-pds">"</span></span>;
 
-            "establish"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish<span class="pl-pds">"</span></span>._(() =&gt;
             {
-            ParentEngine = new EvaluationEngine();
-            ChildEngine = new EvaluationEngine(ParentEngine);
+            ParentEngine = <span class="pl-k">new</span> EvaluationEngine();
+            ChildEngine = <span class="pl-k">new</span> EvaluationEngine(ParentEngine);
 
-            ParentEngine.Solve&lt;Question, string&gt;()
-            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            ParentEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
             .ByEvaluating((q, p) =&gt; ParentExpression);
 
-            ChildEngine.Solve&lt;Question, string&gt;()
-                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+            ChildEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                 .ByEvaluating((q, p) =&gt; ChildExpression);
         });
         }
         }
         }
 
-        protected static IEvaluationEngine ParentEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ParentEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected static IEvaluationEngine ChildEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ChildEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected class Question : IQuestion&lt;string&gt;
+        <span class="pl-k">protected</span> <span class="pl-k">class</span> <span class="pl-en">Question</span> : <span class="pl-k">IQuestion</span>&lt;<span class="pl-k">string</span>&gt;
         {
-            public string Describe()
+            <span class="pl-k">public</span> <span class="pl-k">string</span> <span class="pl-en">Describe</span>()
             {
-                return "test question";
+                <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>test question<span class="pl-pds">"</span></span>;
             }
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>Make it runnable:</p>
 
@@ -473,74 +467,74 @@
 <li>move the <code>establish</code> from the base class into the class holding the Scenarios as a <code>Background</code> step</li>
 </ul>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using System;
+    <span class="pl-k">using</span> System;
 
-    using FluentAssertions;
+    <span class="pl-k">using</span> FluentAssertions;
 
-    using Xbehave;
+    <span class="pl-k">using</span> Xbehave;
 
-    public partial class Hierarchical_evaluation_engines
+    <span class="pl-k">public</span> <span class="pl-k">partial</span> <span class="pl-k">class</span> <span class="pl-en">Hierarchical_evaluation_engines</span>
     {
-        protected const string ParentAggregator = "parentAggregator";
-        protected const string ChildAggregator = "childAggregator";
-        protected const string ParentExpression = "parentExpression";
-        protected const string ChildExpression = "childExpression";
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentAggregator = <span class="pl-s"><span class="pl-pds">"</span>parentAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildAggregator = <span class="pl-s"><span class="pl-pds">"</span>childAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ParentExpression = <span class="pl-s"><span class="pl-pds">"</span>parentExpression<span class="pl-pds">"</span></span>;
+        <span class="pl-k">protected</span> <span class="pl-k">const</span> <span class="pl-k">string</span> ChildExpression = <span class="pl-s"><span class="pl-pds">"</span>childExpression<span class="pl-pds">"</span></span>;
 
         [Background]
-        public void Background()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Background</span>()
         {
-            "establish"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish<span class="pl-pds">"</span></span>._(() =&gt;
             {
-            ParentEngine = new EvaluationEngine();
-            ChildEngine = new EvaluationEngine(ParentEngine);
+            ParentEngine = <span class="pl-k">new</span> EvaluationEngine();
+            ChildEngine = <span class="pl-k">new</span> EvaluationEngine(ParentEngine);
 
-            ParentEngine.Solve&lt;Question, string&gt;()
-            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            ParentEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
             .ByEvaluating((q, p) =&gt; ParentExpression);
 
-            ChildEngine.Solve&lt;Question, string&gt;()
-                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+            ChildEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                 .ByEvaluating((q, p) =&gt; ChildExpression);
             });
         }
 
-        protected static IEvaluationEngine ParentEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ParentEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected static IEvaluationEngine ChildEngine { get; private set; }
+        <span class="pl-k">protected</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ChildEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">private</span> <span class="pl-k">set</span>; }
 
-        protected class Question : IQuestion&lt;string&gt;
+        <span class="pl-k">protected</span> <span class="pl-k">class</span> <span class="pl-en">Question</span> : <span class="pl-k">IQuestion</span>&lt;<span class="pl-k">string</span>&gt;
         {
-            public string Describe()
+            <span class="pl-k">public</span> <span class="pl-k">string</span> <span class="pl-en">Describe</span>()
             {
-                return "test question";
+                <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>test question<span class="pl-pds">"</span></span>;
             }
         }
 
         [Scenario]
-        public void When_calling_answer_on_a_child_evaluation_engine()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_on_a_child_evaluation_engine</span>()
         {
-            string childAnswer = null;
+            <span class="pl-k">string</span> childAnswer = <span class="pl-c1">null</span>;
 
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                childAnswer = ChildEngine.Answer(new Question());
+                childAnswer = ChildEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should override parent aggregator with child aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should override parent aggregator with child aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.Should().Contain(ChildAggregator);
             });
 
-            "it should use expressions from child and parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions from child and parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer
                 .Should().Contain(ParentExpression)
                 .And.Contain(ChildExpression);
             });
 
-            "it should evaluate expressions from parent first"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions from parent first<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
                 .Should().BeTrue();
@@ -548,29 +542,28 @@
     }
 
         [Scenario]
-        public void When_calling_answer_on_a_parent_evaluation_engine()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">When_calling_answer_on_a_parent_evaluation_engine</span>()
         {
-            string parentAnswer = null;
+            <span class="pl-k">string</span> parentAnswer = <span class="pl-c1">null</span>;
 
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                parentAnswer = ParentEngine.Answer(new Question());
+                parentAnswer = ParentEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should use parent aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use parent aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().Contain(ParentAggregator);
             });
 
-            "it should use expressions only from parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions only from parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().NotContain(ChildExpression);
             });
 
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>And then some clean-up:</p>
 
@@ -583,63 +576,63 @@
 <li>remove unnecessary white space</li>
 </ul>
 
-<pre><code>namespace Appccelerate.EvaluationEngine
+<div class="highlight highlight-c#"><pre><span class="pl-k">namespace</span> <span class="pl-en">Appccelerate.EvaluationEngine</span>
 {
-    using System;
+    <span class="pl-k">using</span> System;
 
-    using FluentAssertions;
+    <span class="pl-k">using</span> FluentAssertions;
 
-    using Xbehave;
+    <span class="pl-k">using</span> Xbehave;
 
-    public class HierarchicalEvaluationEngines
+    <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">HierarchicalEvaluationEngines</span>
     {
-        const string ParentAggregator = "parentAggregator";
-        const string ChildAggregator = "childAggregator";
-        const string ParentExpression = "parentExpression";
-        const string ChildExpression = "childExpression";
+        <span class="pl-k">const</span> <span class="pl-k">string</span> ParentAggregator = <span class="pl-s"><span class="pl-pds">"</span>parentAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">const</span> <span class="pl-k">string</span> ChildAggregator = <span class="pl-s"><span class="pl-pds">"</span>childAggregator<span class="pl-pds">"</span></span>;
+        <span class="pl-k">const</span> <span class="pl-k">string</span> ParentExpression = <span class="pl-s"><span class="pl-pds">"</span>parentExpression<span class="pl-pds">"</span></span>;
+        <span class="pl-k">const</span> <span class="pl-k">string</span> ChildExpression = <span class="pl-s"><span class="pl-pds">"</span>childExpression<span class="pl-pds">"</span></span>;
 
-        private static IEvaluationEngine ParentEngine { get; set; }
-        private static IEvaluationEngine ChildEngine { get; set; }
+        <span class="pl-k">private</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ParentEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">set</span>; }
+        <span class="pl-k">private</span> <span class="pl-k">static</span> IEvaluationEngine <span class="pl-en">ChildEngine</span> { <span class="pl-k">get</span>; <span class="pl-k">set</span>; }
 
         [Background]
-        public void Background()
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">Background</span>()
         {
-            "establish a hierarchical evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>establish a hierarchical evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                ParentEngine = new EvaluationEngine();
-                ChildEngine = new EvaluationEngine(ParentEngine);
+                ParentEngine = <span class="pl-k">new</span> EvaluationEngine();
+                ChildEngine = <span class="pl-k">new</span> EvaluationEngine(ParentEngine);
 
-                ParentEngine.Solve&lt;Question, string&gt;()
-                .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+                ParentEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+                .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                 .ByEvaluating((q, p) =&gt; ParentExpression);
 
-                ChildEngine.Solve&lt;Question, string&gt;()
-                    .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+                ChildEngine.Solve&lt;Question, <span class="pl-k">string</span>&gt;()
+                    .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, <span class="pl-k">value</span>) =&gt; aggregate + <span class="pl-k">value</span>)
                     .ByEvaluating((q, p) =&gt; ChildExpression);
             });
         }
 
         [Scenario]
-        public void QuestionChild(string childAnswer)
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">QuestionChild</span>(<span class="pl-k">string</span> <span class="pl-smi">childAnswer</span>)
         {
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                childAnswer = ChildEngine.Answer(new Question());
+                childAnswer = ChildEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should override parent aggregator with child aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should override parent aggregator with child aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.Should().Contain(ChildAggregator);
             });
 
-            "it should use expressions from child and parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions from child and parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer
                 .Should().Contain(ParentExpression)
                 .And.Contain(ChildExpression);
             });
 
-            "it should evaluate expressions from parent first"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should evaluate expressions from parent first<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
                 .Should().BeTrue();
@@ -647,34 +640,33 @@
         }
 
         [Scenario]
-        public void QuestionParent(string parentAnswer)
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">QuestionParent</span>(<span class="pl-k">string</span> <span class="pl-smi">parentAnswer</span>)
         {
-            "when calling answer on a child evaluation engine"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>when calling answer on a child evaluation engine<span class="pl-pds">"</span></span>._(() =&gt;
             {
-                parentAnswer = ParentEngine.Answer(new Question());
+                parentAnswer = ParentEngine.Answer(<span class="pl-k">new</span> Question());
             });
 
-            "it should use parent aggregator"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use parent aggregator<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().Contain(ParentAggregator);
             });
 
-            "it should use expressions only from parent"._(() =&gt;
+            <span class="pl-s"><span class="pl-pds">"</span>it should use expressions only from parent<span class="pl-pds">"</span></span>._(() =&gt;
             {
                 parentAnswer.Should().NotContain(ChildExpression);
             });
         }
 
-        private class Question : IQuestion&lt;string&gt;
+        <span class="pl-k">private</span> <span class="pl-k">class</span> <span class="pl-en">Question</span> : <span class="pl-k">IQuestion</span>&lt;<span class="pl-k">string</span>&gt;
         {
-            public string Describe()
+            <span class="pl-k">public</span> <span class="pl-k">string</span> <span class="pl-en">Describe</span>()
             {
-                return "test question";
+                <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>test question<span class="pl-pds">"</span></span>;
             }
         }
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>Be happy!</p>
 
