@@ -19,10 +19,247 @@
     </section>
 
     <section class="main-content">
-      <h3>
-<a id="machinespecifications-to-xbehavenet-converter" class="anchor" href="#machinespecifications-to-xbehavenet-converter" aria-hidden="true"><span class="octicon octicon-link"></span></a>Machine.Specifications to xBehave.net converter</h3>
+      <h1>
+<a id="machinespecifications-to-xbehavenet-converter" class="anchor" href="#machinespecifications-to-xbehavenet-converter" aria-hidden="true"><span class="octicon octicon-link"></span></a>Machine.Specifications to xBehave.net converter</h1>
 
 <p>Helps to migrate specifications or tests made with MSpec to xBehave.net by doing all the syntax replacement for you.</p>
+
+<h1>
+<a id="scenarios" class="anchor" href="#scenarios" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scenarios</h1>
+
+<p>See samples on how to migrate specifications.</p>
+
+<h2>
+<a id="happy-case" class="anchor" href="#happy-case" aria-hidden="true"><span class="octicon octicon-link"></span></a>Happy case</h2>
+
+<p>MSpec:</p>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using FluentAssertions;
+    using Machine.Specifications;
+
+    [Subject("Question answering")]
+    public class When_calling_answer_with_expressions_with_constraints
+    {
+        private const string NoConstraint = "N";
+        private const string WithTrueConstraint = "T";
+        private const string WithFalseConstraint = "F";
+
+        private static IEvaluationEngine engine;
+
+        private static string answer;
+
+        Establish context = () =&gt;
+            {
+                engine = new EvaluationEngine();
+
+                engine.Solve&lt;WhatIsTheText, string&gt;()
+                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                    .ByEvaluating((q, p) =&gt; NoConstraint)
+                    .When(q =&gt; false)
+                        .ByEvaluating((q, p) =&gt; WithFalseConstraint)
+                    .When(q =&gt; true)
+                        .ByEvaluating((q, p) =&gt; WithTrueConstraint);
+            };
+
+        Because of = () =&gt;
+            {
+                answer = engine.Answer(new WhatIsTheText());
+            };
+
+        It should_evaluate_expressions_without_constraints = () =&gt; 
+            answer.Should().Contain(NoConstraint);
+
+        It should_evaluate_expressions_with_fulfilled_constraints = () =&gt; 
+            answer.Should().Contain(WithTrueConstraint);
+
+        It should_ignore_expressions_with_constraints_that_are_not_fulfilled = () =&gt; 
+            answer.Should().NotContain(WithFalseConstraint);
+    }
+}
+</code></pre>
+
+<p>After automatic conversion:</p>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using FluentAssertions;
+    using Xbehave;
+
+    public partial class Question_answering
+    {
+        [Scenario]
+        public void When_calling_answer_with_expressions_with_constraints()
+        {
+        private const string NoConstraint = "N";
+        private const string WithTrueConstraint = "T";
+        private const string WithFalseConstraint = "F";
+
+            IEvaluationEngine engine = null;
+
+            string answer = null;
+
+            "establish"._(() =&gt;
+            {
+                engine = new EvaluationEngine();
+
+                engine.Solve&lt;WhatIsTheText, string&gt;()
+                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                    .ByEvaluating((q, p) =&gt; NoConstraint)
+                    .When(q =&gt; false)
+                        .ByEvaluating((q, p) =&gt; WithFalseConstraint)
+                    .When(q =&gt; true)
+                        .ByEvaluating((q, p) =&gt; WithTrueConstraint);
+            });
+
+            "when calling answer with expressions with constraints"._(() =&gt;
+            {
+                answer = engine.Answer(new WhatIsTheText());
+            });
+
+            "it should evaluate expressions without constraints"._(() =&gt;
+            {
+                answer.Should().Contain(NoConstraint);
+            });
+
+            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            {
+                answer.Should().Contain(WithTrueConstraint);
+            });
+
+            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            {
+                answer.Should().NotContain(WithFalseConstraint);
+            });
+        }
+    }
+}
+</code></pre>
+
+<p>Remove <code>private</code> from constant definitions:</p>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using FluentAssertions;
+    using Xbehave;
+
+    public partial class Question_answering
+    {
+        [Scenario]
+        public void When_calling_answer_with_expressions_with_constraints()
+        {
+            const string NoConstraint = "N";
+            const string WithTrueConstraint = "T";
+            const string WithFalseConstraint = "F";
+
+            IEvaluationEngine engine = null;
+
+            string answer = null;
+
+            "establish"._(() =&gt;
+            {
+                engine = new EvaluationEngine();
+
+                engine.Solve&lt;WhatIsTheText, string&gt;()
+                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                    .ByEvaluating((q, p) =&gt; NoConstraint)
+                    .When(q =&gt; false)
+                        .ByEvaluating((q, p) =&gt; WithFalseConstraint)
+                    .When(q =&gt; true)
+                        .ByEvaluating((q, p) =&gt; WithTrueConstraint);
+            });
+
+            "when calling answer with expressions with constraints"._(() =&gt;
+            {
+                answer = engine.Answer(new WhatIsTheText());
+            });
+
+            "it should evaluate expressions without constraints"._(() =&gt;
+            {
+                answer.Should().Contain(NoConstraint);
+            });
+
+            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            {
+                answer.Should().Contain(WithTrueConstraint);
+            });
+
+            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            {
+                answer.Should().NotContain(WithFalseConstraint);
+            });
+        }
+    }
+}
+</code></pre>
+
+<p>This spec is runnable.</p>
+
+<p>Now let's finish with some clean-up:</p>
+
+<ul>
+<li>move locals to method parameters (Ctrl+R, Ctrl+P in R#)</li>
+<li>remove partial (not needed in this scenario)</li>
+<li>better naming instead of <code>establish</code>
+</li>
+<li>shorten the scenario name</li>
+</ul>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using FluentAssertions;
+    using Xbehave;
+
+    public class Question_answering
+    {
+        [Scenario]
+        public void Constraints(
+            IEvaluationEngine engine, 
+            string answer)
+        {
+            const string NoConstraint = "N";
+            const string WithTrueConstraint = "T";
+            const string WithFalseConstraint = "F";
+
+            "establish an evaluation engine with constraint expressions"._(() =&gt;
+            {
+                engine = new EvaluationEngine();
+
+                engine.Solve&lt;WhatIsTheText, string&gt;()
+                    .AggregateWithExpressionAggregator(string.Empty, (aggregate, value) =&gt; aggregate + value)
+                    .ByEvaluating((q, p) =&gt; NoConstraint)
+                    .When(q =&gt; false)
+                        .ByEvaluating((q, p) =&gt; WithFalseConstraint)
+                    .When(q =&gt; true)
+                        .ByEvaluating((q, p) =&gt; WithTrueConstraint);
+            });
+
+            "when calling answer with expressions with constraints"._(() =&gt;
+            {
+                answer = engine.Answer(new WhatIsTheText());
+            });
+
+            "it should evaluate expressions without constraints"._(() =&gt;
+            {
+                answer.Should().Contain(NoConstraint);
+            });
+
+            "it should evaluate expressions with fulfilled constraints"._(() =&gt;
+            {
+                answer.Should().Contain(WithTrueConstraint);
+            });
+
+            "it should ignore expressions with constraints that are not fulfilled"._(() =&gt;
+            {
+                answer.Should().NotContain(WithFalseConstraint);
+            });
+        }
+    }
+}
+</code></pre>
+
+<p>Finished!</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ursenzler/MSpec2xBehaveConverter">Mspec2xbehaveconverter</a> is maintained by <a href="https://github.com/ursenzler">ursenzler</a>.</span>
