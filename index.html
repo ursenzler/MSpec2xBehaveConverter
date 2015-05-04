@@ -25,6 +25,29 @@
 <p>Helps to migrate specifications or tests made with MSpec to xBehave.net by doing all the syntax replacement for you.</p>
 
 <h1>
+<a id="what-the-converter-does-maybe-looking-at-the-samples-below-is-easier-to-understand--o-" class="anchor" href="#what-the-converter-does-maybe-looking-at-the-samples-below-is-easier-to-understand--o-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What the converter does (maybe looking at the samples below is easier to understand :-O )</h1>
+
+<p>The converter tries to convert the MSpec syntax to xBehave.net syntax:</p>
+
+<ul>
+<li>for every class attributed by <code>Subject</code> it creates an enclosing class (the class holding the Scenario) and a method for the Scenario.</li>
+<li>for every <code>Establish</code>, <code>Because</code> and <code>It</code> it creates a corresponding string with <code>_(() =&gt;</code> notation containing the corresponding action.</li>
+<li>it copies the name of the class in MSpec syntax to the <em>because</em> string in xBehave syntax</li>
+<li>it removes the <code>_</code> from all names.</li>
+<li>it replaces the Machine.Specifications using with XBehave</li>
+<li>it tries to let everything else as is.</li>
+</ul>
+
+<h1>
+<a id="preparatory-steps" class="anchor" href="#preparatory-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Preparatory steps</h1>
+
+<ol>
+<li>Add a reference (Nuget) to xBehave.net &gt;= 2.0 (currently in pre-release).</li>
+<li>Inline all <code>Subject(CONSTANT)</code> so that it looks like <code>Subject("some text")</code>.</li>
+<li>Make sure that everything is under version control in case the converter <em>obfuscates</em> your code.</li>
+</ol>
+
+<h1>
 <a id="scenarios" class="anchor" href="#scenarios" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scenarios</h1>
 
 <p>See samples on how to migrate specifications.</p>
