@@ -578,8 +578,105 @@
 <li>remove partial</li>
 <li>remove unnecessary <code>protected</code>
 </li>
-<li>better naming of establish in Background step</li>
+<li>better naming of establish in Background step, of class holding scenarios and method names of scenarios</li>
+<li>move fields and nested class to a nicer place inside class holding Scenarios</li>
+<li>remove unnecessary white space</li>
 </ul>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using System;
+
+    using FluentAssertions;
+
+    using Xbehave;
+
+    public class HierarchicalEvaluationEngines
+    {
+        const string ParentAggregator = "parentAggregator";
+        const string ChildAggregator = "childAggregator";
+        const string ParentExpression = "parentExpression";
+        const string ChildExpression = "childExpression";
+
+        private static IEvaluationEngine ParentEngine { get; set; }
+        private static IEvaluationEngine ChildEngine { get; set; }
+
+        [Background]
+        public void Background()
+        {
+            "establish a hierarchical evaluation engine"._(() =&gt;
+            {
+                ParentEngine = new EvaluationEngine();
+                ChildEngine = new EvaluationEngine(ParentEngine);
+
+                ParentEngine.Solve&lt;Question, string&gt;()
+                .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+                .ByEvaluating((q, p) =&gt; ParentExpression);
+
+                ChildEngine.Solve&lt;Question, string&gt;()
+                    .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+                    .ByEvaluating((q, p) =&gt; ChildExpression);
+            });
+        }
+
+        [Scenario]
+        public void QuestionChild(string childAnswer)
+        {
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                childAnswer = ChildEngine.Answer(new Question());
+            });
+
+            "it should override parent aggregator with child aggregator"._(() =&gt;
+            {
+                childAnswer.Should().Contain(ChildAggregator);
+            });
+
+            "it should use expressions from child and parent"._(() =&gt;
+            {
+                childAnswer
+                .Should().Contain(ParentExpression)
+                .And.Contain(ChildExpression);
+            });
+
+            "it should evaluate expressions from parent first"._(() =&gt;
+            {
+                childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
+                .Should().BeTrue();
+            });
+        }
+
+        [Scenario]
+        public void QuestionParent(string parentAnswer)
+        {
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                parentAnswer = ParentEngine.Answer(new Question());
+            });
+
+            "it should use parent aggregator"._(() =&gt;
+            {
+                parentAnswer.Should().Contain(ParentAggregator);
+            });
+
+            "it should use expressions only from parent"._(() =&gt;
+            {
+                parentAnswer.Should().NotContain(ChildExpression);
+            });
+        }
+
+        private class Question : IQuestion&lt;string&gt;
+        {
+            public string Describe()
+            {
+                return "test question";
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>Be happy!</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ursenzler/MSpec2xBehaveConverter">Mspec2xbehaveconverter</a> is maintained by <a href="https://github.com/ursenzler">ursenzler</a>.</span>
