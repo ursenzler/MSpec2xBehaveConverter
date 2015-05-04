@@ -172,8 +172,9 @@ namespace MSpec2xBehaveConverter
                 }
 
                 // closing }
-                int classEnd = this.FindClosingBracket(classStart, 1);
-                this.content = this.content.Substring(0, classEnd - 1) + "    }\r\n    " + this.content.Substring(classEnd - 1);
+                int lastIt = this.content.LastIndexOf("_(() =>");
+                int lastItEnd = this.FindClosingBracket(this.FindNextOpeningBracket(lastIt));
+                this.content = this.content.Substring(0, lastItEnd + 2) + "\r\n        }" + this.content.Substring(lastItEnd + 2);
                 
 
                 // and the next

@@ -139,6 +139,13 @@ namespace Appccelerate.Bootstrapper
                 sequence.ElementAt(7).Should().BeEquivalentTo(""FirstExtension: Register"");
                 sequence.ElementAt(8).Should().BeEquivalentTo(""SecondExtension: Register"");
             };
+
+        private static Queue<string> Noise;
+
+        private static void Noise()
+        {
+            // noise
+        }
     }
 }";
         }
