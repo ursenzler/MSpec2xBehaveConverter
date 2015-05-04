@@ -105,6 +105,10 @@ namespace MSpec2xBehaveConverter
                     {
                         lambda++;
                     }
+
+                    var because = scenarioName.Replace("_", " ").TrimEnd();
+                    because = because.Substring(0, 1).ToLowerInvariant() + because.Substring(1);
+
                     if (this.content[lambda] == '{') // lambda with { }
                     {
                         int becauseEnd = this.FindClosingBracket(this.FindNextOpeningBracket(becauseStart));
@@ -113,7 +117,7 @@ namespace MSpec2xBehaveConverter
 
                         this.content = this.content.Replace(
                             this.content.Substring(becauseStart, becauseEnd - becauseStart),
-                            "    \"because\"._(() =>\r\n            " +
+                            "    \"" + because + "\"._(() =>\r\n            " +
                             becauseAction.TrimEnd().TrimEnd(';') +
                             ")");
                     }
@@ -124,7 +128,7 @@ namespace MSpec2xBehaveConverter
 
                         this.content = this.content.Replace(
                             this.content.Substring(becauseStart, semicolon - becauseStart),
-                            "    \"because\"._(() =>\r\n            {\r\n                " +
+                            "    \"" + because + "\"._(() =>\r\n            {\r\n                " +
                             becauseAction.TrimEnd() +
                             ";\r\n            })");
                     }

@@ -54,7 +54,7 @@ namespace Appccelerate.Bootstrapper
                 Bootstrapper.AddExtension(Second);
             });
 
-            "because"._(() =>
+            "when the bootstrapper is run"._(() =>
             {
                 Bootstrapper.Run();
             });
@@ -97,6 +97,13 @@ namespace Appccelerate.Bootstrapper
                 sequence.ElementAt(7).Should().BeEquivalentTo("FirstExtension: Register");
                 sequence.ElementAt(8).Should().BeEquivalentTo("SecondExtension: Register");
             });
+        }
+
+            Queue<string> Noise = null;
+
+        private static void Noise()
+        {
+            // noise
         }
     }
 }
