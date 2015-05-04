@@ -261,6 +261,326 @@
 
 <p>Finished!</p>
 
+<h2>
+<a id="converting-specs-with-base-classes" class="anchor" href="#converting-specs-with-base-classes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Converting Specs with base classes</h2>
+
+<p>If you used base classes in your MSpec specifications, then you need to prepare your classes first.</p>
+
+<p>There are several possibilities:</p>
+
+<ul>
+<li>inline all code in the base class in the derived classes (probably introducing a lot of code duplication)</li>
+<li>move the code from the base class into a helper class that you call from within the establish of the derived classes (no code duplication)</li>
+<li>convert the derived classes and the base class and move the code from the base class as a <code>Background</code> step into the merged class holding all scenarios. (see below)</li>
+</ul>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using System;
+
+    using FluentAssertions;
+
+    using Machine.Specifications;
+
+    [Subject(Concern.HierarchicalEngines)]
+    public class When_calling_answer_on_a_child_evaluation_engine : HierarchicalEngineContext
+    {
+        private static string childAnswer;
+
+        Because of = () =&gt;
+            {
+                childAnswer = ChildEngine.Answer(new Question());
+            };
+
+        It should_override_parent_aggregator_with_child_aggregator = () =&gt; 
+            childAnswer.Should().Contain(ChildAggregator);
+
+        It should_use_expressions_from_child_and_parent = () =&gt; 
+            childAnswer
+                .Should().Contain(ParentExpression)
+                .And.Contain(ChildExpression);
+
+        It should_evaluate_expressions_from_parent_first = () =&gt;
+            childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
+                .Should().BeTrue();
+    }
+
+    [Subject(Concern.HierarchicalEngines)]
+    public class When_calling_answer_on_a_parent_evaluation_engine : HierarchicalEngineContext
+    {
+        private static string parentAnswer;
+
+        Because of = () =&gt;
+            {
+                parentAnswer = ParentEngine.Answer(new Question());
+            };
+
+        It should_use_parent_aggregator = () =&gt; 
+            parentAnswer.Should().Contain(ParentAggregator);
+
+        It should_use_expressions_only_from_parent = () =&gt; 
+            parentAnswer.Should().NotContain(ChildExpression);
+    }
+
+    [Subject(Concern.HierarchicalEngines)]
+    public class HierarchicalEngineContext
+    {
+        protected const string ParentAggregator = "parentAggregator";
+        protected const string ChildAggregator = "childAggregator";
+        protected const string ParentExpression = "parentExpression";
+        protected const string ChildExpression = "childExpression";
+
+        Establish context = () =&gt;
+        {
+            ParentEngine = new EvaluationEngine();
+            ChildEngine = new EvaluationEngine(ParentEngine);
+
+            ParentEngine.Solve&lt;Question, string&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            .ByEvaluating((q, p) =&gt; ParentExpression);
+
+            ChildEngine.Solve&lt;Question, string&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+                .ByEvaluating((q, p) =&gt; ChildExpression);
+        };
+
+        protected static IEvaluationEngine ParentEngine { get; private set; }
+
+        protected static IEvaluationEngine ChildEngine { get; private set; }
+
+        protected class Question : IQuestion&lt;string&gt;
+        {
+            public string Describe()
+            {
+                return "test question";
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>After automatic convertion:</p>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using System;
+
+    using FluentAssertions;
+
+    using Xbehave;
+
+    public partial class Hierarchical_evaluation_engines
+    {
+        [Scenario]
+        public void When_calling_answer_on_a_child_evaluation_engine()
+        {
+            string childAnswer = null;
+
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                childAnswer = ChildEngine.Answer(new Question());
+            });
+
+            "it should override parent aggregator with child aggregator"._(() =&gt;
+            {
+                childAnswer.Should().Contain(ChildAggregator);
+            });
+
+            "it should use expressions from child and parent"._(() =&gt;
+            {
+                childAnswer
+                .Should().Contain(ParentExpression)
+                .And.Contain(ChildExpression);
+            });
+
+            "it should evaluate expressions from parent first"._(() =&gt;
+            {
+                childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
+                .Should().BeTrue();
+            });
+    }
+
+    public partial class Hierarchical_evaluation_engines
+    {
+        [Scenario]
+        public void When_calling_answer_on_a_parent_evaluation_engine()
+        {
+            string parentAnswer = null;
+
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                parentAnswer = ParentEngine.Answer(new Question());
+            });
+
+            "it should use parent aggregator"._(() =&gt;
+            {
+                parentAnswer.Should().Contain(ParentAggregator);
+            });
+
+            "it should use expressions only from parent"._(() =&gt;
+            {
+                parentAnswer.Should().NotContain(ChildExpression);
+            });
+    }
+
+    public partial class Hierarchical_evaluation_engines
+    {
+        [Scenario]
+        public void HierarchicalEngineContext()
+        {
+        protected const string ParentAggregator = "parentAggregator";
+        protected const string ChildAggregator = "childAggregator";
+        protected const string ParentExpression = "parentExpression";
+        protected const string ChildExpression = "childExpression";
+
+            "establish"._(() =&gt;
+            {
+            ParentEngine = new EvaluationEngine();
+            ChildEngine = new EvaluationEngine(ParentEngine);
+
+            ParentEngine.Solve&lt;Question, string&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            .ByEvaluating((q, p) =&gt; ParentExpression);
+
+            ChildEngine.Solve&lt;Question, string&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+                .ByEvaluating((q, p) =&gt; ChildExpression);
+        });
+        }
+        }
+        }
+
+        protected static IEvaluationEngine ParentEngine { get; private set; }
+
+        protected static IEvaluationEngine ChildEngine { get; private set; }
+
+        protected class Question : IQuestion&lt;string&gt;
+        {
+            public string Describe()
+            {
+                return "test question";
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>Make it runnable:</p>
+
+<ul>
+<li>remove the second partial class definition <code>public partial class Hierarchical_evaluation_engines {</code> so that you just have a single class with Scenarios.</li>
+<li>move the fields and nested classes into the class holding the Scenarios</li>
+<li>move the <code>establish</code> from the base class into the class holding the Scenarios as a <code>Background</code> step</li>
+</ul>
+
+<pre><code>namespace Appccelerate.EvaluationEngine
+{
+    using System;
+
+    using FluentAssertions;
+
+    using Xbehave;
+
+    public partial class Hierarchical_evaluation_engines
+    {
+        protected const string ParentAggregator = "parentAggregator";
+        protected const string ChildAggregator = "childAggregator";
+        protected const string ParentExpression = "parentExpression";
+        protected const string ChildExpression = "childExpression";
+
+        [Background]
+        public void Background()
+        {
+            "establish"._(() =&gt;
+            {
+            ParentEngine = new EvaluationEngine();
+            ChildEngine = new EvaluationEngine(ParentEngine);
+
+            ParentEngine.Solve&lt;Question, string&gt;()
+            .AggregateWithExpressionAggregator(ParentAggregator, (aggregate, value) =&gt; aggregate + value)
+            .ByEvaluating((q, p) =&gt; ParentExpression);
+
+            ChildEngine.Solve&lt;Question, string&gt;()
+                .AggregateWithExpressionAggregator(ChildAggregator, (aggregate, value) =&gt; aggregate + value)
+                .ByEvaluating((q, p) =&gt; ChildExpression);
+            });
+        }
+
+        protected static IEvaluationEngine ParentEngine { get; private set; }
+
+        protected static IEvaluationEngine ChildEngine { get; private set; }
+
+        protected class Question : IQuestion&lt;string&gt;
+        {
+            public string Describe()
+            {
+                return "test question";
+            }
+        }
+
+        [Scenario]
+        public void When_calling_answer_on_a_child_evaluation_engine()
+        {
+            string childAnswer = null;
+
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                childAnswer = ChildEngine.Answer(new Question());
+            });
+
+            "it should override parent aggregator with child aggregator"._(() =&gt;
+            {
+                childAnswer.Should().Contain(ChildAggregator);
+            });
+
+            "it should use expressions from child and parent"._(() =&gt;
+            {
+                childAnswer
+                .Should().Contain(ParentExpression)
+                .And.Contain(ChildExpression);
+            });
+
+            "it should evaluate expressions from parent first"._(() =&gt;
+            {
+                childAnswer.EndsWith(ParentExpression + ChildExpression, StringComparison.Ordinal)
+                .Should().BeTrue();
+            });
+    }
+
+        [Scenario]
+        public void When_calling_answer_on_a_parent_evaluation_engine()
+        {
+            string parentAnswer = null;
+
+            "when calling answer on a child evaluation engine"._(() =&gt;
+            {
+                parentAnswer = ParentEngine.Answer(new Question());
+            });
+
+            "it should use parent aggregator"._(() =&gt;
+            {
+                parentAnswer.Should().Contain(ParentAggregator);
+            });
+
+            "it should use expressions only from parent"._(() =&gt;
+            {
+                parentAnswer.Should().NotContain(ChildExpression);
+            });
+
+        }
+    }
+}
+</code></pre>
+
+<p>And then some clean-up:</p>
+
+<ul>
+<li>remove partial</li>
+<li>remove unnecessary <code>protected</code>
+</li>
+<li>better naming of establish in Background step</li>
+</ul>
+
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ursenzler/MSpec2xBehaveConverter">Mspec2xbehaveconverter</a> is maintained by <a href="https://github.com/ursenzler">ursenzler</a>.</span>
 
