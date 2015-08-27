@@ -44,7 +44,7 @@ namespace MSpec2xBehaveConverter
 
         private void ReplaceSubjects()
         {
-            int subjectIndex = this.FindIndexOf("[Subject(");
+            int subjectIndex = this.FindIndexOf("[Subject(", 0);
 
             while(subjectIndex >= 0)
             {
@@ -61,6 +61,7 @@ namespace MSpec2xBehaveConverter
                 string scenarioName = this.content.Substring(scenarioNameStart, scenarioNameEnd - scenarioNameStart);
 
                 int classStart = this.FindIndexOf("{", subjectIndex);
+                int classEnd = this.FindClosingBracket(classStart);
 
                 // public partial class <subject>
                 // [Scenario]
@@ -72,34 +73,59 @@ namespace MSpec2xBehaveConverter
                     scenarioName.TrimEnd() +
                     "()\r\n        ");
 
+                classStart = this.FindIndexOf("{", subjectIndex);
+                classEnd = this.FindClosingBracket(classStart, 1);
+
                 // private static -> = null
-                Regex field = new Regex(@"(private|protected) static (?<f>[\w<>]+ \w+);");
+                Regex field = new Regex(@"(private |protected )?static (?<f>[\w<>]+ \w+);");
                 this.content = field.Replace(this.content, @"    ${f} = null;");
 
+                var noise = new[] { ' ', '\r', '\n', '\t', '(', ')', '=', '>' };
+
                 // establish
-                int establishStart = this.FindIndexOf("Establish ", classStart);
+                int establishStart = this.FindIndexOf("Establish ", classStart, classEnd);
                 while (establishStart >= 0)
                 {
-                    int establishEnd = this.FindClosingBracket(this.FindNextOpeningBracket(establishStart));
-                    int x = this.FindNextOpeningBracket(establishStart);
-                    string establishAction = this.content.Substring(x, establishEnd - x);
-                
-                    this.content = this.content.Replace(
-                        this.content.Substring(establishStart, establishEnd - establishStart),
-                        "    \"establish\"._(() =>\r\n            " + 
-                        establishAction.TrimEnd().TrimEnd(';') + 
-                        ")");
+                    int lambda = this.FindIndexOf("=>", establishStart, classEnd);
 
-                    establishStart = this.FindIndexOf("Establish ", classStart);
-                }
+                    while (noise.Contains(this.content[lambda]))
+                    {
+                        lambda++;
+                    }
 
-                var noise = new[] { ' ', '\r', '\n', '\t', '(', ')', '=', '>' };
-                
+                    if (this.content[lambda] == '{') // lambda with { }
+                    {
+                        int establishEnd = this.FindClosingBracket(this.FindNextOpeningBracket(establishStart));
+                        int x = this.FindNextOpeningBracket(establishStart);
+                        string establishAction = this.content.Substring(x, establishEnd - x);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(establishStart, establishEnd - establishStart),
+                            "    \"establish\"._(() =>\r\n            " +
+                            establishAction.TrimEnd().TrimEnd(';') +
+                            ")");
+                    }
+                    else
+                    {
+                        int semicolon = this.FindIndexOf(";", establishStart, classEnd);
+                        string establishAction = this.content.Substring(lambda, semicolon - lambda);
+
+                        this.content = this.content.Replace(
+                            this.content.Substring(establishStart, semicolon - establishStart),
+                            "    \"establish" + "\"._(() =>\r\n            {\r\n        " +
+                            this.Indent(establishAction.TrimEnd(), 8) +
+                            ";\r\n            })");
+                    }
+
+                    classEnd = this.FindClosingBracket(classStart, 1);
+                    establishStart = this.FindIndexOf("Establish ", classStart, classEnd);
+                }    
+            
                 // because of
-                int becauseStart = this.FindIndexOf("Because ", classStart);
+                int becauseStart = this.FindIndexOf("Because ", classStart, classEnd);
                 while (becauseStart >= 0)
                 {
-                    int lambda = this.FindIndexOf("=>", becauseStart);
+                    int lambda = this.FindIndexOf("=>", becauseStart, classEnd);
 
                     while (noise.Contains(this.content[lambda]))
                     {
@@ -123,24 +149,32 @@ namespace MSpec2xBehaveConverter
                     }
                     else // lambda without { }
                     {
-                        int semicolon = this.FindIndexOf(";", becauseStart);
+                        int semicolon = this.FindIndexOf(";", becauseStart, classEnd);
                         string becauseAction = this.content.Substring(lambda, semicolon - lambda);
 
-                        this.content = this.content.Replace(
-                            this.content.Substring(becauseStart, semicolon - becauseStart),
-                            "    \"" + because + "\"._(() =>\r\n            {\r\n                " +
-                            becauseAction.TrimEnd() +
-                            ";\r\n            })");
+                        this.content =
+                            this.content.Substring(0, becauseStart)
+                            + "    \"" + because + "\"._(() =>\r\n            {\r\n                "
+                            + becauseAction.TrimEnd()
+                            + ";\r\n            })"
+                            + this.content.Substring(semicolon);
+
+                        //this.content = this.content.Replace(
+                        //    this.content.Substring(becauseStart, semicolon - becauseStart),
+                        //    "    \"" + because + "\"._(() =>\r\n            {\r\n                " +
+                        //    becauseAction.TrimEnd() +
+                        //    ";\r\n            })");
                     }
 
-                    becauseStart = this.FindIndexOf("Because ", classStart);
+                    classEnd = this.FindClosingBracket(classStart, 1);
+                    becauseStart = this.FindIndexOf("Because ", classStart, classEnd);
                 }
                 
                 // it
-                int itStart = this.FindIndexOf("It ", classStart);
+                int itStart = this.FindIndexOf("It ", classStart, classEnd);
                 while (itStart > 0)
                 {
-                    int lambda = this.FindIndexOf("=>", itStart);
+                    int lambda = this.FindIndexOf("=>", itStart, classEnd);
 
                     while (noise.Contains(this.content[lambda]))
                     {
@@ -150,7 +184,7 @@ namespace MSpec2xBehaveConverter
                     {
                         int itEnd = this.FindClosingBracket(this.FindNextOpeningBracket(itStart));
                         int z = this.FindNextOpeningBracket(itStart);
-                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
+                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4, classEnd) - itStart - 3).Replace("_", " ");
                         string itAction = this.content.Substring(z, itEnd - z);
 
                         this.content = this.content.Replace(
@@ -161,8 +195,8 @@ namespace MSpec2xBehaveConverter
                     }
                     else // lambda without { }
                     {
-                        int semicolon = this.FindIndexOf(";", itStart);
-                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4) - itStart - 3).Replace("_", " ");
+                        int semicolon = this.FindIndexOf(";", itStart, classEnd);
+                        string it = this.content.Substring(itStart + 3, this.FindIndexOf(" ", itStart + 4, classEnd) - itStart - 3).Replace("_", " ");
                         string itAction = this.content.Substring(lambda, semicolon - lambda);
 
                         this.content = this.content.Replace(
@@ -172,23 +206,40 @@ namespace MSpec2xBehaveConverter
                             ";\r\n            })");
                     }
 
-                    itStart = this.FindIndexOf("It ", classStart);
+                    classEnd = this.FindClosingBracket(classStart, 1);
+                    itStart = this.FindIndexOf("It ", classStart, classEnd);
                 }
 
                 // closing }
-                int lastIt = this.content.LastIndexOf("_(() =>");
+                int lastIt = this.FindLastIndexOf("_(() =>", classStart, classEnd);
                 int lastItEnd = this.FindClosingBracket(this.FindNextOpeningBracket(lastIt));
                 this.content = this.content.Substring(0, lastItEnd + 2) + "\r\n        }" + this.content.Substring(lastItEnd + 2);
                 
 
                 // and the next
-                subjectIndex = this.FindIndexOf("[Subject(");
+                subjectIndex = this.FindIndexOf("[Subject(", 0);
             }
         }
 
-        private int FindIndexOf(string search, int start =  0)
+        private int FindIndexOf(string search, int start, int end = int.MaxValue)
         {
-            return this.content.IndexOf(search, start, StringComparison.InvariantCulture);
+            var findIndexOf = this.content.IndexOf(search, start, StringComparison.InvariantCulture);
+
+            return findIndexOf <= end ? findIndexOf : -1;
+        }
+
+        private int FindLastIndexOf(string search, int start, int end)
+        {
+            int result = -1;
+            
+            var findIndexOf = this.content.IndexOf(search, start, StringComparison.InvariantCulture);
+            while (findIndexOf < end && findIndexOf >= 0)
+            {
+                result = findIndexOf;
+                findIndexOf = this.content.IndexOf(search, findIndexOf + 1, StringComparison.InvariantCulture);
+            }
+
+            return result;
         }
 
         private int FindNextOpeningBracket(int start)
@@ -199,6 +250,14 @@ namespace MSpec2xBehaveConverter
             }
 
             return start;
+        }
+
+        private string Indent(string text, int indentation)
+        {
+            string spaces = new string(' ', indentation);
+            var result = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => spaces + line);
+            return string.Join(Environment.NewLine, result);
         }
 
         private int FindClosingBracket(int positionOfOpeningBracket, int numberOfStillOpenBrackets = 0)
